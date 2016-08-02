@@ -45,13 +45,13 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
     private int nNativeMemory = 0;
 
     private final int gcInterval = 100;
-    private LinkedList<String> aStringAlloc = new LinkedList<String>();
-    private LinkedList<String> aStringConcat = new LinkedList<String>();
-    private LinkedList<Bitmap> aBitmapSmall = new LinkedList<Bitmap>();
-    private LinkedList<Bitmap> aBitmapLarge = new LinkedList<Bitmap>();
-    private LinkedList<Long> aNativeMemory = new LinkedList<Long>();
+    private LinkedList<String> aStringAlloc = new LinkedList<>();
+    private LinkedList<String> aStringConcat = new LinkedList<>();
+    private LinkedList<Bitmap> aBitmapSmall = new LinkedList<>();
+    private LinkedList<Bitmap> aBitmapLarge = new LinkedList<>();
+    private LinkedList<Long> aNativeMemory = new LinkedList<>();
 
-    private Thread explitGC;
+    private Thread explicitGC;
     private Thread stringAlloc;
     private Thread stringConcat;
     private Thread bitmapSmall;
@@ -134,7 +134,7 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
         super.onDestroy();
         log("onDestroy");
 
-        stopThread(explitGC);
+        stopThread(explicitGC);
         stopThread(stringAlloc);
         stopThread(stringConcat);
         stopThread(bitmapSmall);
@@ -293,7 +293,7 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
 
     public void onExplitGC(View view) {
         if (((CheckBox)view).isChecked()) {
-            explitGC = new Thread(new Runnable() {
+            explicitGC = new Thread(new Runnable() {
                 public void run() {
                     while(!Thread.currentThread().isInterrupted()) {
                         System.gc();
@@ -301,10 +301,10 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
                     }
                 }
             }, getString(R.string.explicit_gc));
-            explitGC.start();
-            log("startThread " + explitGC.getName());
+            explicitGC.start();
+            log("startThread " + explicitGC.getName());
         } else {
-            stopThread(explitGC);
+            stopThread(explicitGC);
         }
     }
 
