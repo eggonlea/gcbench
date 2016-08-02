@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">GC Bench</string>
+    <string name="gc_text">Threads:</string>
+    <string name="string_alloc">StrAlloc</string>
+    <string name="string_concat">StrConcat</string>
+    <string name="explicit_gc">GCLoop</string>
+    <string name="small_bitmap">SmallBitmap</string>
+    <string name="large_bitmap">LargeBitmap</string>
+    <string name="native_memory">NativeMemory</string>
+    <string name="cap_memory">CapHeap</string>
+    <string name="max_memory">NoCap/OOM</string>
+    <string name="memory_info">Calculating…</string>
+    <string name="item_info">ItemSize:</string>
+
+</resources>
