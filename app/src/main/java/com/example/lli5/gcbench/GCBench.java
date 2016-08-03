@@ -26,7 +26,7 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
     private SeekBar mRatioBar;
     private TextView mMemInfoRT;
     private TextView mMemInfoAM;
-    private TextView mExplitGC;
+    private TextView mExplicitGC;
     private TextView mStringAlloc;
     private TextView mStringConcat;
     private TextView mBitmapSmall;
@@ -34,15 +34,19 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
     private TextView mNativeMemory;
     private TextView mLogs;
     private int mLogn = 0;
+    private boolean shouldUpdate = true;
     private Handler mHandler = new Handler();
 
+    private long nFootprintRT = 0;
+    private long nFootprintAM = 0;
+    private long nFootprintNM = 0;
     private long nFreeRT = -1;
     private long nAvailAM = -1;
-    private int nStringAlloc = 0;
-    private int nStringConcat = 0;
-    private int nBitMapSmall = 0;
-    private int nBitmapLarge = 0;
-    private int nNativeMemory = 0;
+    private int nStringAlloc = -1;
+    private int nStringConcat = -1;
+    private int nBitMapSmall = -1;
+    private int nBitmapLarge = -1;
+    private int nNativeMemory = -1;
 
     private final int gcInterval = 100;
     private LinkedList<String> aStringAlloc = new LinkedList<>();
@@ -73,8 +77,8 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
         ((RadioButton)findViewById(R.id.maxMemory)).setChecked(true);
         mMemInfoRT = (TextView)findViewById(R.id.memoryInfoRT);
         mMemInfoAM = (TextView)findViewById(R.id.memoryInfoAM);
-        mExplitGC = (TextView)findViewById(R.id.explitGCInfo);
-        mExplitGC.setText(gcInterval + "ms");
+        mExplicitGC = (TextView)findViewById(R.id.explicitGCInfo);
+        mExplicitGC.setText(gcInterval + "ms");
         mStringAlloc = (TextView)findViewById(R.id.stringAllocInfo);
         mStringConcat = (TextView)findViewById(R.id.stringConcatInfo);
         mBitmapSmall = (TextView)findViewById(R.id.bitmapSmallInfo);
@@ -121,6 +125,11 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
     protected void onResume() {
         super.onResume();
         log("onResume");
+        try {
+            checkMemoryCapping();
+        } catch (OutOfMemoryError e) {
+            /* do nothing */
+        }
     }
 
     @Override
@@ -129,18 +138,25 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
         log("onPause");
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        log("onDestroy");
-
+    protected void stopThreads() {
         stopThread(explicitGC);
         stopThread(stringAlloc);
         stopThread(stringConcat);
         stopThread(bitmapSmall);
         stopThread(bitmapLarge);
         stopThread(nativeMemory);
+        log("*** Stop threads");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        log("onDestroy");
+
+        stopThreads();
         mHandler.removeCallbacksAndMessages(null);
+        log("Remove timer handler");
+
         log("Finishing...");
         finish();
     }
@@ -148,36 +164,6 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
     private void updateInfo()
     {
         try {
-            long free = Runtime.getRuntime().freeMemory() / MB;
-            if(nFreeRT != free) {
-                nFreeRT = free;
-                long total = Runtime.getRuntime().totalMemory();
-                long max = Runtime.getRuntime().maxMemory();
-                String s = "RT: Free/Total/Max/Cap(%) = "
-                        + free + "/"
-                        + total / MB + "/"
-                        + max / MB + "/"
-                        + mCapMB + "MB ("
-                        + mHeapRatio + "%)";
-                mMemInfoRT.setText(s);
-                log(s);
-            }
-
-            ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-            ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-            am.getMemoryInfo(mi);
-            long avail = mi.availMem / MB;
-            if(nAvailAM != avail) {
-                nAvailAM = avail;
-                String s = "AM: Avail/Thres/Total (Low) = "
-                        + avail + "/"
-                        + mi.threshold / MB + "/"
-                        + mi.totalMem / MB + " ("
-                        + mi.lowMemory + ")";
-                mMemInfoAM.setText(s);
-                log(s);
-            }
-
             int alloc = aStringAlloc.size();
             if(nStringAlloc != alloc) {
                 nStringAlloc = alloc;
@@ -217,6 +203,45 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
                 mNativeMemory.setText(s);
                 log("NativeMemory: " + s);
             }
+
+            checkMemoryCapping();
+
+            long freeRT = Runtime.getRuntime().freeMemory() / MB;
+            long totalRT = Runtime.getRuntime().totalMemory() / MB;
+            long maxRT = Runtime.getRuntime().maxMemory() / MB;
+            if(nFreeRT != freeRT || shouldUpdate) {
+                nFreeRT = freeRT;
+                String s = "RT: Free/Total/Max/Cap(%) = "
+                        + freeRT + "/"
+                        + totalRT + "/"
+                        + maxRT + "/"
+                        + mCapMB + " MB ("
+                        + mHeapRatio + "%) Footprint = "
+                        + nFootprintRT;
+                mMemInfoRT.setText(s);
+                log(s);
+            }
+
+            ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+            ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+            am.getMemoryInfo(mi);
+            long availAM = mi.availMem / MB;
+            long totalAM = mi.totalMem / MB;
+            long thresAM = mi.threshold / MB;
+            if(nAvailAM != availAM || shouldUpdate) {
+                nAvailAM = availAM;
+                String s = "AM: Avail/Thres/Total (Low) = "
+                        + availAM + "/"
+                        + thresAM + "/"
+                        + totalAM + " ("
+                        + mi.lowMemory + ") Footprint = "
+                        + nFootprintNM + " / "
+                        + nFootprintAM;
+                mMemInfoAM.setText(s);
+                log(s);
+            }
+
+            shouldUpdate = false;
         } catch (OutOfMemoryError e) {
             log(e.toString());
         }
@@ -227,7 +252,8 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
         switch (seekBar.getId()) {
             case R.id.capMemoryMB:
                 mCapMB = progress;
-                ((RadioButton)findViewById(R.id.capMemory)).setChecked(true);
+                ((RadioButton)findViewById(R.id.maxMemory)).setChecked(mCapMB == 0);
+                ((RadioButton)findViewById(R.id.capMemory)).setChecked(mCapMB > 0);
                 break;
             case R.id.heapRatio:
                 mHeapRatio = progress;
@@ -273,14 +299,33 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
 
     private void checkMemoryCapping()
     {
+        long total = Runtime.getRuntime().totalMemory() / MB;
+        if (total > nFootprintRT) {
+            nFootprintRT = total;
+            shouldUpdate = true;
+        }
+
+        ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+        am.getMemoryInfo(mi);
+        long used = (mi.totalMem - mi.availMem) / MB;
+        if (used > nFootprintAM) {
+            nFootprintAM = used;
+            shouldUpdate = true;
+        }
+
         if (mCapMB > 0) {
+            /* estimated memory footprint
             long size = 0;
             size += aStringAlloc.size() * 96;
             size += aStringConcat.size() * 128;
-            size += aBitmapSmall.size() * (16 * 16 * 2 + 12);
+            size += aBitmapSmall.size() * (64 * 64 * 2 + 12);
             size += aBitmapLarge.size() * (1024 * 1024 * 4 + 12);
-            if (size > mCapMB * MB)
+            */
+            if (total > mCapMB) {
+                Log.w(TAG, "*** Reaching Memory Cap");
                 throw new OutOfMemoryError();
+            }
         }
     }
 
@@ -291,7 +336,7 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
             List.remove();
     }
 
-    public void onExplitGC(View view) {
+    public void onExplicitGC(View view) {
         if (((CheckBox)view).isChecked()) {
             explicitGC = new Thread(new Runnable() {
                 public void run() {
@@ -313,11 +358,12 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
             stringAlloc = new Thread(new Runnable() {
                 public void run() {
                     while(!Thread.currentThread().isInterrupted()) {
-                        SystemClock.sleep(1);
+                        //SystemClock.sleep(1);
                         try {
-                            checkMemoryCapping();
                             aStringAlloc.add(new String("1234567890"));
+                            checkMemoryCapping();
                         } catch (OutOfMemoryError e) {
+                            Log.w(TAG, "*** stringAlloc OOO");
                             trimList(aStringAlloc);
                             System.gc();
                         }
@@ -338,12 +384,13 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
                 public void run() {
                     int i = 100;
                     while(!Thread.currentThread().isInterrupted()) {
-                        SystemClock.sleep(1);
+                        //SystemClock.sleep(1);
                         try {
-                            checkMemoryCapping();
                             aStringConcat.add("abcdefg" + i + ".");
                             i = i < 999 ? i + 1: 100;
+                            checkMemoryCapping();
                         } catch (OutOfMemoryError e) {
+                            Log.w(TAG, "*** stringConcat OOO");
                             trimList(aStringConcat);
                             System.gc();
                         }
@@ -363,11 +410,12 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
             bitmapSmall = new Thread(new Runnable() {
                 public void run() {
                     while(!Thread.currentThread().isInterrupted()) {
-                        SystemClock.sleep(1);
+                        //SystemClock.sleep(1);
                         try {
+                            aBitmapSmall.add(Bitmap.createBitmap(64, 64, Bitmap.Config.RGB_565));
                             checkMemoryCapping();
-                            aBitmapSmall.add(Bitmap.createBitmap(16, 16, Bitmap.Config.RGB_565));
                         } catch (OutOfMemoryError e) {
+                            Log.w(TAG, "*** smallBitmap OOO");
                             trimList(aBitmapSmall);
                             System.gc();
                         }
@@ -387,13 +435,14 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
             bitmapLarge = new Thread(new Runnable() {
                 public void run() {
                     while(!Thread.currentThread().isInterrupted()) {
-                        SystemClock.sleep(1000);
+                        SystemClock.sleep(100);
                         try {
-                            checkMemoryCapping();
                             aBitmapLarge.add(Bitmap.createBitmap(1024, 1024, Bitmap.Config.ARGB_8888));
+                            checkMemoryCapping();
                         } catch (OutOfMemoryError e) {
-                            //trimList(aBitmapLarge);
-                            aBitmapLarge.clear();
+                            Log.w(TAG, "*** largeBitmap OOO");
+                            trimList(aBitmapLarge);
+                            //aBitmapLarge.clear();
                             System.gc();
                         }
                     }
@@ -413,13 +462,16 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
                 public void run() {
                     while(!Thread.currentThread().isInterrupted()) {
                         SystemClock.sleep(10);
-                        checkMemoryCapping();
                         long ptr = nativeMalloc(MB);
-                        if (ptr > 0) {
+                        if (ptr != 0) {
                             aNativeMemory.add(ptr);
+                            if (aNativeMemory.size() > nFootprintNM) {
+                                nFootprintNM = aNativeMemory.size();
+                                shouldUpdate = true;
+                            }
                         } else {
-                            Log.w(TAG, "Failed to allocate native memory");
-                            while(!aNativeMemory.isEmpty()) {
+                            Log.w(TAG, "*** nativeMemory OOO");
+                            while (!aNativeMemory.isEmpty()) {
                                 nativeFree(aNativeMemory.removeFirst());
                             }
                             System.gc();
@@ -470,6 +522,8 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
                 break;
             case TRIM_MEMORY_RUNNING_CRITICAL:
                 reason = "RUNNING CRITICAL";
+                updateInfo();
+                stopThreads();
                 break;
             case TRIM_MEMORY_RUNNING_LOW:
                 reason = "RUNNING LOW";
@@ -484,13 +538,24 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
                 reason = "[INVALID]";
                 break;
         }
-
-        log("onTrimMemory(" + level + "): " + reason);
+        log("### onTrimMemory(" + level + "): " + reason);
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        log("onLowMemory()");
+        updateInfo();
+        stopThreads();
+        log("### onLowMemory()");
+    }
+
+    public void onClearLog(View view) {
+        mLogs.setText("");
+    }
+
+    public void onResetFP(View view) {
+        nFootprintRT = nFootprintAM = nFootprintNM = 0;
+        shouldUpdate = true;
+        updateInfo();
     }
 }

@@ -13,5 +13,7 @@
     <string name="max_memory">NoCap/OOM</string>
     <string name="memory_info">Calculating…</string>
     <string name="item_info">ItemSize:</string>
+    <string name="clear_log">Clear Logs</string>
+    <string name="reset_footprint">Reset Footprint</string>
 
 </resources>

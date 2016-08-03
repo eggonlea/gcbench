@@ -119,14 +119,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:id="@+id/explitGCInfo"/>
+                android:id="@+id/explicitGCInfo"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/explicit_gc"
-                android:id="@+id/explitGC"
-                android:onClick="onExplitGC" />
+                android:id="@+id/explicitGC"
+                android:onClick="onExplicitGC" />
 
         </LinearLayout>
         <Space
@@ -263,17 +263,42 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:id="@+id/logs"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <Button
+                    android:text="@string/clear_log"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/buttonClearLog"
+                    android:onClick="onClearLog"/>
+                <Button
+                    android:text="@string/reset_footprint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/buttonResetFP"
+                    android:onClick="onResetFP"/>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/logs"
+                android:scrollbars="vertical"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="end">
+            android:layout_height="match_parent">
 
             <com.example.lli5.gcbench.UIView
                 android:layout_width="match_parent"
