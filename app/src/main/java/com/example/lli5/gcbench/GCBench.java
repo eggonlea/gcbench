@@ -500,7 +500,6 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
         if(lines > 0) {
             int y = Math.max(0, tv.getLayout().getLineTop(lines) - tv.getHeight());
             tv.scrollTo(0, y);
-            Log.i(TAG, "lines: " + lines + " y: " + y);
         }
     }
 
