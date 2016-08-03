@@ -211,15 +211,14 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
             long maxRT = Runtime.getRuntime().maxMemory() / MB;
             if(nFreeRT != freeRT || shouldUpdate) {
                 nFreeRT = freeRT;
-                String s = "RT: Free/Total/Max/Cap(%) = "
-                        + freeRT + "/"
+                String s = freeRT + "/"
                         + totalRT + "/"
                         + maxRT + "/"
                         + mCapMB + " MB ("
                         + mHeapRatio + "%) FP="
                         + nFootprintRT;
-                mMemInfoRT.setText(s);
-                log(s);
+                mMemInfoRT.setText("RT: F/Total/Max/Cap(%) = " + s);
+                log("RT: " + s);
             }
 
             ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
@@ -230,15 +229,14 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
             long thresAM = mi.threshold / MB;
             if(nAvailAM != availAM || shouldUpdate) {
                 nAvailAM = availAM;
-                String s = "AM: Avail/Thres/Total (Low) = "
-                        + availAM + "/"
+                String s = availAM + "/"
                         + thresAM + "/"
                         + totalAM + " ("
                         + mi.lowMemory + ") FP="
                         + nFootprintNM + "/"
                         + nFootprintAM;
-                mMemInfoAM.setText(s);
-                log(s);
+                mMemInfoAM.setText("AM: Avail/Thres/Total (Low) = " + s);
+                log("AM: " + s);
             }
 
             shouldUpdate = false;
@@ -502,6 +500,7 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
         if(lines > 0) {
             int y = Math.max(0, tv.getLayout().getLineTop(lines) - tv.getHeight());
             tv.scrollTo(0, y);
+            Log.i(TAG, "lines: " + lines + " y: " + y);
         }
     }
 

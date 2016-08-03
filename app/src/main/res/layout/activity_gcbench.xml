@@ -2,7 +2,9 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
@@ -258,15 +260,17 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:orientation="horizontal"
+    <android.support.percent.PercentRelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
             android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent">
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_widthPercent="38.2%"
+            android:id="@+id/logslayout">
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -287,7 +291,7 @@
             </LinearLayout>
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/logs"
                 android:scrollbars="vertical"
@@ -297,8 +301,10 @@
 
         <LinearLayout
             android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_widthPercent="61.8%"
+            android:layout_toEndOf="@id/logslayout">
 
             <com.example.lli5.gcbench.UIView
                 android:layout_width="match_parent"
@@ -321,6 +327,6 @@
                 android:id="@+id/ThreadedSurfaceView" />
 
         </LinearLayout>
-</LinearLayout>
+    </android.support.percent.PercentRelativeLayout>
 
 </LinearLayout>
