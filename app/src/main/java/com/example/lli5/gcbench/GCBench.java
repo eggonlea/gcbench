@@ -216,7 +216,7 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
                         + totalRT + "/"
                         + maxRT + "/"
                         + mCapMB + " MB ("
-                        + mHeapRatio + "%) Footprint = "
+                        + mHeapRatio + "%) FP="
                         + nFootprintRT;
                 mMemInfoRT.setText(s);
                 log(s);
@@ -234,8 +234,8 @@ public class GCBench extends Activity implements SeekBar.OnSeekBarChangeListener
                         + availAM + "/"
                         + thresAM + "/"
                         + totalAM + " ("
-                        + mi.lowMemory + ") Footprint = "
-                        + nFootprintNM + " / "
+                        + mi.lowMemory + ") FP="
+                        + nFootprintNM + "/"
                         + nFootprintAM;
                 mMemInfoAM.setText(s);
                 log(s);
