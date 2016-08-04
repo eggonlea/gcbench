@@ -23,7 +23,7 @@ public class ThreadedSurfaceView extends SurfaceView implements SurfaceHolder.Ca
 
         public DrawThread(SurfaceHolder holder) {
             mHolder = holder;
-            mDraw = new StatDraw("ThreadedSurfaceView", Color.CYAN, Color.GREEN, Color.GRAY);
+            mDraw = new StatDraw("TSView", Color.CYAN, Color.GREEN, Color.GRAY);
         }
 
         @Override

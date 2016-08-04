@@ -44,7 +44,7 @@ public class ChoreographerSurfaceView extends SurfaceView implements SurfaceHold
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        statDraw = new StatDraw("ChoreographerSurfaceView", Color.YELLOW, Color.BLUE, Color.GRAY);
+        statDraw = new StatDraw("CSView", Color.YELLOW, Color.BLUE, Color.GRAY);
         mSurfaceHolder = holder;
         mChoreographer = Choreographer.getInstance();
         mVSyncFrameCallback = new Choreographer.FrameCallback() {

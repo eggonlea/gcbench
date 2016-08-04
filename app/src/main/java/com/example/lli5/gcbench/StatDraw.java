@@ -82,8 +82,8 @@ public class StatDraw {
         int x = 0;
         int y = 1;
         try {
-            canvas.drawText("View: " + mName, x, (y++) * d, mTextPaint);
-            canvas.drawText("Frames: " + mFrames, x, (y++) * d, mTextPaint);
+            canvas.drawText("View: " + mName + " (" + mWidth + "x" + mHeight + ")", x, (y++) * d, mTextPaint);
+            canvas.drawText("Frames: " + mX + " / " + mFrames, x, (y++) * d, mTextPaint);
             canvas.drawText("Drops: " + mDrops, x, (y++) * d, mTextPaint);
             canvas.drawText("Delta: " + delta + " / " + mMaxDelta, x, (y++) * d, mTextPaint);
             canvas.drawText("Draw: " + mDrawTime + " / " + mMaxDraw, x, (y++) * d, mTextPaint);
