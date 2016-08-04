@@ -50,19 +50,20 @@ public class StatDraw {
     }
 
     public void draw(Canvas canvas) {
-        if(mWidth <= 0 || mHeight <= 0)
+        if(mWidth <= 0 || mHeight <= 0) {
             return;
+        }
 
-        long curTime = System.currentTimeMillis();
+        long curTime = SystemClock.uptimeMillis();
         long delta = curTime - mTime;
-        if(delta > 33)
-            mDrops ++;
-        if(delta > mMaxDelta)
+        if(delta > 33) {
+            mDrops++;
+        }
+        if(delta > mMaxDelta) {
             mMaxDelta = delta;
+        }
         mTime = curTime;
         mFrames ++;
-
-        curTime = SystemClock.uptimeMillis();
 
         mLines[mX * 4] = mX;
         mLines[mX * 4 + 1] = mHeight - delta;
@@ -96,7 +97,8 @@ public class StatDraw {
         }
 
         mDrawTime = SystemClock.uptimeMillis() - curTime;
-        if(mDrawTime > mMaxDraw)
+        if(mDrawTime > mMaxDraw) {
             mMaxDraw = mDrawTime;
+        }
     }
 }
