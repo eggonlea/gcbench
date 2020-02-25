@@ -4,6 +4,7 @@
 
 #include <jni.h>
 #include <stdlib.h>
+#include <string.h>
 
 jlong Java_com_example_lli5_gcbench_GCBench_nativeMalloc(
         JNIEnv* env,
