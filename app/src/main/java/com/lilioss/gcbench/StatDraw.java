@@ -1,4 +1,4 @@
-package com.example.lli5.gcbench;
+package com.lilioss.gcbench;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -6,7 +6,7 @@ import android.os.SystemClock;
 import android.text.TextPaint;
 
 /**
- * Created by lli5 on 8/27/14.
+ * Created by lilioss on 8/27/14.
  */
 public class StatDraw {
     private int mFrames = 0;

@@ -1,4 +1,4 @@
-package com.example.lli5.gcbench;
+package com.lilioss.gcbench;
 
 import android.app.Activity;
 import android.app.ActivityManager;

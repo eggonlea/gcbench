@@ -1,4 +1,4 @@
-package com.example.lli5.gcbench;
+package com.lilioss.gcbench;
 
 import android.annotation.TargetApi;
 import android.content.Context;

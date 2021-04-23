@@ -306,14 +306,14 @@
             app:layout_widthPercent="61.8%"
             android:layout_toEndOf="@id/logslayout">
 
-            <com.example.lli5.gcbench.UIView
+            <com.lilioss.gcbench.UIView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:id="@+id/UIView"
                 android:background="#cccccc" />
 
-            <com.example.lli5.gcbench.ChoreographerSurfaceView
+            <com.lilioss.gcbench.ChoreographerSurfaceView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -323,7 +323,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                class="com.example.lli5.gcbench.ThreadedSurfaceView"
+                class="com.lilioss.gcbench.ThreadedSurfaceView"
                 android:id="@+id/ThreadedSurfaceView" />
 
         </LinearLayout>

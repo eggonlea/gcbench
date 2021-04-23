@@ -22,7 +22,7 @@ android {
     compileSdkVersion 23
     buildToolsVersion '28.0.3'
     defaultConfig {
-        applicationId "com.example.lli5.gcbench"
+        applicationId "com.lilioss.gcbench"
         minSdkVersion 23
         targetSdkVersion 23
         versionCode 1

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.lli5.gcbench" >
+    package="com.lilioss.gcbench" >
 
     <application
         android:allowBackup="true"
@@ -9,7 +9,7 @@
         android:theme="@style/AppTheme"
         android:largeHeap="true" >
         <activity
-            android:name=".GCBench"
+            android:name="com.lilioss.gcbench.GCBench"
             android:label="@string/app_name"
             android:launchMode="singleInstance">
             <intent-filter>
